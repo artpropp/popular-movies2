@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Popular Movies</string>
+    <string name="movie_poster">Movie Poster</string>
+    <string name="release_date_prefix">Release Date:</string>
+    <string name="vote_average_prefix">Vote Average:</string>
+    <string name="detail_error_message">An error occurred while trying to present movie details</string>
+    <string name="fetching_error_message">Could not fetch movies. Have your set the API key in the MainActivity?</string>
+    <string name="popular_movies">Popular Movies</string>
+    <string name="top_rated_movies">Top Rated Movies</string>
+</resources>
