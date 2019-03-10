@@ -7,6 +7,8 @@ import com.artpropp.popularmovies.models.MoviesResponse;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,9 +35,18 @@ public class ApiService implements Callback<MoviesResponse> {
 
     public ApiService(String apiKey) {
         mApiKey = apiKey;
+
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        OkHttpClient httpClient = new OkHttpClient.Builder()
+                .addInterceptor(loggingInterceptor)
+                .build();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseApiUrl)
                 .addConverterFactory(MoshiConverterFactory.create())
+                .client(httpClient)
                 .build();
         mTheMovieDbApi = retrofit.create(TheMovieDbApi.class);
     }
