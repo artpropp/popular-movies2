@@ -7,4 +7,7 @@
     <string name="fetching_error_message">Could not fetch movies. Have your set the API key in the MainActivity?</string>
     <string name="popular_movies">Popular Movies</string>
     <string name="top_rated_movies">Top Rated Movies</string>
+    <string name="vote_average">%1$.1f/10</string>
+    <string name="mark_as_favorite">Mark as Favorite</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
 </resources>
