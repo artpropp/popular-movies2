@@ -11,15 +11,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.artpropp.popularmovies.adapters.MainAdapter;
 import com.artpropp.popularmovies.models.Movie;
 import com.artpropp.popularmovies.models.MoviesResponse;
 import com.artpropp.popularmovies.utilities.ApiService;
+import com.artpropp.popularmovies.viewmodels.MainViewModel;
 
 import java.util.List;
 
 public class MainActivity
         extends AppCompatActivity
-        implements MovieListAdapter.OnMovieClickListener, MovieListAdapter.OnLoadMoreListener, ApiService.Observer {
+        implements MainAdapter.OnMovieClickListener, MainAdapter.OnLoadMoreListener, ApiService.Observer {
 
     private static final String API_KEY = "";
 
@@ -32,14 +34,14 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MovieListAdapter movieListAdapter = new MovieListAdapter(this);
+        MainAdapter mainAdapter = new MainAdapter(this);
         RecyclerView recyclerView = findViewById(R.id.movie_posters_rv);
         int spanCount = 2;
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             spanCount = 3;
         }
         recyclerView.setLayoutManager(new GridLayoutManager(this, spanCount));
-        recyclerView.setAdapter(movieListAdapter);
+        recyclerView.setAdapter(mainAdapter);
 
         mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
@@ -48,8 +50,8 @@ public class MainActivity
 
         mViewModel.getFetchPage().observe(this, this::onPageSet);
         mViewModel.getMovies().observe(this, movies -> {
-            movieListAdapter.setMovieList(movies);
-            movieListAdapter.notifyDataSetChanged();
+            mainAdapter.setMovieList(movies);
+            mainAdapter.notifyDataSetChanged();
         });
         mViewModel.getPageTitle().observe(this, this::setActionBarTitle);
 

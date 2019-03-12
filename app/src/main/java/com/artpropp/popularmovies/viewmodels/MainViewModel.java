@@ -1,4 +1,4 @@
-package com.artpropp.popularmovies;
+package com.artpropp.popularmovies.viewmodels;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;

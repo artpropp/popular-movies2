@@ -1,4 +1,4 @@
-package com.artpropp.popularmovies;
+package com.artpropp.popularmovies.adapters;
 
 
 import android.support.annotation.NonNull;
@@ -8,13 +8,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.artpropp.popularmovies.R;
 import com.artpropp.popularmovies.models.Movie;
 import com.artpropp.popularmovies.utilities.ImageService;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.MoviePosterViewHolder> {
+public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MoviePosterViewHolder> {
 
     public interface OnMovieClickListener {
         void onItemClick(Movie movie);
@@ -28,14 +29,14 @@ public class MovieListAdapter extends RecyclerView.Adapter<MovieListAdapter.Movi
     private OnMovieClickListener mMovieClickListener;
     private OnLoadMoreListener mLoadMoreListener;
 
-    MovieListAdapter(OnMovieClickListener movieClickListener) {
+    public MainAdapter(OnMovieClickListener movieClickListener) {
         mMovieClickListener = movieClickListener;
         if (movieClickListener instanceof OnLoadMoreListener) {
             mLoadMoreListener = (OnLoadMoreListener) movieClickListener;
         }
     }
 
-    void setMovieList(List<Movie> movieList) {
+    public void setMovieList(List<Movie> movieList) {
         mMovieList = movieList;
     }
 
