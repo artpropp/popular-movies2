@@ -5,21 +5,28 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.artpropp.popularmovies.MainActivity;
 import com.artpropp.popularmovies.R;
 import com.artpropp.popularmovies.adapters.DetailAdapter;
 import com.artpropp.popularmovies.models.Movie;
 import com.artpropp.popularmovies.models.Trailer;
+import com.artpropp.popularmovies.models.TrailerResponse;
+import com.artpropp.popularmovies.utilities.ApiService;
 
 import java.util.List;
 import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class DetailViewModel extends AndroidViewModel {
 
     private DetailAdapter mAdapter;
 
+    private boolean initialized = false;
     private String mTitle;
     private String mReleaseYear;
     private String mPosterUrl;
@@ -40,6 +47,8 @@ public class DetailViewModel extends AndroidViewModel {
     }
 
     public void init(LifecycleOwner lifecycleOwner, Movie movie) {
+        mLifecycleOwner = lifecycleOwner;
+        if (initialized) return;
         mTitle = movie.getTitle();
         mReleaseYear = movie.getReleaseDate().substring(0, movie.getReleaseDate().indexOf('-'));
         mPosterUrl = movie.getPosterPath();
@@ -50,9 +59,11 @@ public class DetailViewModel extends AndroidViewModel {
             mAdapter.setTrailers(trailers);
             mAdapter.notifyDataSetChanged();
         });
-        mLifecycleOwner = lifecycleOwner;
 
         mAdapter.notifyDataSetChanged();
+        getTrailers(movie);
+
+        initialized = true;
     }
 
     public DetailAdapter getAdapter() {
@@ -95,11 +106,30 @@ public class DetailViewModel extends AndroidViewModel {
         // TODO: implement intent to view the trailer
     }
 
-    public void setTrailers(List<Trailer> trailers) {
+    private void setTrailers(List<Trailer> trailers) {
         mTrailers.setValue(trailers);
     }
 
     public LiveData<List<Trailer>> getTrailers() {
         return mTrailers;
+    }
+
+    private void getTrailers(Movie movie) {
+        ApiService webservice = new ApiService(MainActivity.API_KEY);
+        webservice.getTrailers(movie.getId(), new Callback<TrailerResponse>() {
+            @SuppressWarnings("NullableProblems")
+            @Override
+            public void onResponse(Call<TrailerResponse> call, Response<TrailerResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    setTrailers(response.body().getResults());
+                }
+            }
+
+            @SuppressWarnings("NullableProblems")
+            @Override
+            public void onFailure(Call<TrailerResponse> call, Throwable t) {
+                // silent failures
+            }
+        });
     }
 }
