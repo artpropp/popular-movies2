@@ -8,11 +8,14 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.artpropp.popularmovies.R;
+import com.artpropp.popularmovies.adapters.DetailAdapter;
 import com.artpropp.popularmovies.models.Movie;
 
 import java.util.Locale;
 
 public class DetailViewModel extends AndroidViewModel {
+
+    private DetailAdapter mAdapter;
 
     private String mTitle;
     private String mReleaseYear;
@@ -24,6 +27,8 @@ public class DetailViewModel extends AndroidViewModel {
     public DetailViewModel(@NonNull Application application) {
         super(application);
 
+        mAdapter = new DetailAdapter(this);
+
         mButtonTitle = new MutableLiveData<>();
         mButtonTitle.setValue(application.getString(R.string.mark_as_favorite));
     }
@@ -34,6 +39,12 @@ public class DetailViewModel extends AndroidViewModel {
         mPosterUrl = movie.getPosterPath();
         mVoteAverage = String.format(Locale.getDefault(), context.getString(R.string.vote_average), movie.getVoteAverage());
         mOverview = movie.getOverview();
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public DetailAdapter getAdapter() {
+        return mAdapter;
     }
 
     public String getTitle() {
