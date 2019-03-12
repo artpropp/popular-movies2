@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
+        <variable
+            name="model"
+            type="com.artpropp.popularmovies.viewmodels.DetailViewModel" />
+    </data>
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -35,6 +41,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginLeft="20dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                android:text="@{model.title}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@id/movie_poster_iv"
@@ -49,6 +56,7 @@
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="10dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:text="@{model.releaseYear}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toEndOf="@id/movie_poster_iv"
@@ -62,6 +70,7 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginTop="10dp"
+                android:text="@{model.voteAverage}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/movie_poster_iv"
@@ -81,6 +90,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                android:text="@{model.overview}"
                 app:layout_constraintTop_toBottomOf="@id/guideline"
                 tools:layout_editor_absoluteX="20dp"
                 tools:text="PLOT Summary" />
@@ -94,6 +104,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="8dp"
                 android:textAppearance="@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored"
+                android:text="@{model.buttonTitle}"
                 app:layout_constraintBottom_toTopOf="@+id/guideline"
                 app:layout_constraintStart_toEndOf="@+id/movie_poster_iv"
                 app:layout_constraintTop_toBottomOf="@+id/vote_average_tv"
