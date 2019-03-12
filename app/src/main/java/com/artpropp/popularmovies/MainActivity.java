@@ -23,7 +23,7 @@ public class MainActivity
         extends AppCompatActivity
         implements MainAdapter.OnMovieClickListener, MainAdapter.OnLoadMoreListener, ApiService.Observer {
 
-    private static final String API_KEY = "";
+    public static final String API_KEY = "";
 
     private MainViewModel mViewModel;
     ApiService mApiService;

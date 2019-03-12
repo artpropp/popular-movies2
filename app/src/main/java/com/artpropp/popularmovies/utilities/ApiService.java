@@ -3,6 +3,7 @@ package com.artpropp.popularmovies.utilities;
 import android.support.annotation.NonNull;
 
 import com.artpropp.popularmovies.models.MoviesResponse;
+import com.artpropp.popularmovies.models.TrailerResponse;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +87,10 @@ public class ApiService implements Callback<MoviesResponse> {
         for (Observer observer : mObservers) {
             observer.onError(errorMessage);
         }
+    }
+
+    public void getTrailers(int id, Callback<TrailerResponse> callback) {
+        mTheMovieDbApi.getTrailers(id, mApiKey).enqueue(callback);
     }
 
 }
