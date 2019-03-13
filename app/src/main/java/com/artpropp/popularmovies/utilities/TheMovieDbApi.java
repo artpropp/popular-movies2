@@ -1,6 +1,7 @@
 package com.artpropp.popularmovies.utilities;
 
 import com.artpropp.popularmovies.models.MoviesResponse;
+import com.artpropp.popularmovies.models.ReviewResponse;
 import com.artpropp.popularmovies.models.TrailerResponse;
 
 import retrofit2.Call;
@@ -24,6 +25,12 @@ public interface TheMovieDbApi {
 
     @GET("movie/{id}/videos")
     Call<TrailerResponse> getTrailers(
+            @Path("id") int id,
+            @Query("api_key") String apiKey
+    );
+
+    @GET("movie/{id}/reviews")
+    Call<ReviewResponse> getReviews(
             @Path("id") int id,
             @Query("api_key") String apiKey
     );

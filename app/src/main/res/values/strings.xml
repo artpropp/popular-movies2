@@ -11,4 +11,6 @@
     <string name="mark_as_favorite">Mark as Favorite</string>
     <string name="remove_from_favorites">Remove from Favorites</string>
     <string name="trailer">Trailer</string>
+    <string name="review">Review</string>
+    <string name="review_by">Review by</string>
 </resources>

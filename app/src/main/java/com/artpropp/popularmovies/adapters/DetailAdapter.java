@@ -8,7 +8,9 @@ import android.view.ViewGroup;
 
 import com.artpropp.popularmovies.R;
 import com.artpropp.popularmovies.databinding.ViewHolderDetailsBinding;
+import com.artpropp.popularmovies.databinding.ViewHolderReviewBinding;
 import com.artpropp.popularmovies.databinding.ViewHolderTrailerBinding;
+import com.artpropp.popularmovies.models.Review;
 import com.artpropp.popularmovies.models.Trailer;
 import com.artpropp.popularmovies.viewmodels.DetailViewModel;
 
@@ -18,9 +20,11 @@ public class DetailAdapter extends RecyclerView.Adapter {
 
     private static final int VIEW_TYPE_DETAILS = 0;
     private static final int VIEW_TYPE_TRAILER = 1;
+    private static final int VIEW_TYPE_REVIEW = 2;
 
     private DetailViewModel mViewModel;
     private List<Trailer> mTrailers;
+    private List<Review> mReviews;
 
     public DetailAdapter(DetailViewModel viewModel) {
         mViewModel = viewModel;
@@ -28,6 +32,10 @@ public class DetailAdapter extends RecyclerView.Adapter {
 
     public void setTrailers(List<Trailer> trailers) {
         mTrailers = trailers;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        mReviews = reviews;
     }
 
     @Override
@@ -38,10 +46,11 @@ public class DetailAdapter extends RecyclerView.Adapter {
         }
         if (position == 0) {
             return VIEW_TYPE_DETAILS;
-        } else if (position < numberOfTrailers) {
+        } else if (position <= numberOfTrailers) {
             return VIEW_TYPE_TRAILER;
+        } else {
+            return VIEW_TYPE_REVIEW;
         }
-        return VIEW_TYPE_TRAILER; // default, prep for reviews
     }
 
     @NonNull
@@ -56,10 +65,15 @@ public class DetailAdapter extends RecyclerView.Adapter {
                 return new DetailsViewHolder(detailsBinding);
 
             case VIEW_TYPE_TRAILER:
-            default:
                 ViewHolderTrailerBinding trailerBinding = DataBindingUtil.inflate(inflater, R.layout.view_holder_trailer, viewGroup, false);
                 trailerBinding.setModel(mViewModel);
                 return new TrailerViewHolder(trailerBinding);
+
+            case VIEW_TYPE_REVIEW:
+            default:
+                ViewHolderReviewBinding reviewBinding = DataBindingUtil.inflate(inflater, R.layout.view_holder_review, viewGroup, false);
+                reviewBinding.setModel(mViewModel);
+                return new ReviewViewHolder(reviewBinding);
         }
     }
 
@@ -72,13 +86,21 @@ public class DetailAdapter extends RecyclerView.Adapter {
 
             case VIEW_TYPE_TRAILER:
                 TrailerViewHolder trailerViewHolder = (TrailerViewHolder) viewHolder;
-                if (mTrailers != null) {
+                if (mTrailers != null && !mTrailers.isEmpty()) {
                     trailerViewHolder.getBinding().setTrailer(mTrailers.get(position-1));
                 }
                 break;
 
+            case VIEW_TYPE_REVIEW:
+                ReviewViewHolder reviewViewHolder = (ReviewViewHolder) viewHolder;
+                if (mReviews != null) {
+                    int offsetByTrailers = (mTrailers != null) ? mTrailers.size() : 0;
+                    reviewViewHolder.getBinding().setReview(mReviews.get(position-offsetByTrailers-1));
+                }
+                break;
+
             default:
-                // so far, nothing to do here
+                // nothing to do here
 
         }
 
@@ -88,7 +110,10 @@ public class DetailAdapter extends RecyclerView.Adapter {
     public int getItemCount() {
         int count = 1;
         if (mTrailers != null) {
-            count = count + mTrailers.size();
+            count += mTrailers.size();
+        }
+        if (mReviews != null) {
+            count += mReviews.size();
         }
         return count;
     }
@@ -115,6 +140,20 @@ public class DetailAdapter extends RecyclerView.Adapter {
         }
 
         ViewHolderTrailerBinding getBinding() {
+            return mBinding;
+        }
+    }
+
+    class ReviewViewHolder extends RecyclerView.ViewHolder {
+
+        ViewHolderReviewBinding mBinding;
+
+        ReviewViewHolder(ViewHolderReviewBinding binding) {
+            super(binding.getRoot());
+            mBinding = binding;
+        }
+
+        ViewHolderReviewBinding getBinding() {
             return mBinding;
         }
     }
