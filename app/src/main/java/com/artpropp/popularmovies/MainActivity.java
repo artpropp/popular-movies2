@@ -25,6 +25,8 @@ public class MainActivity
 
     public static final String API_KEY = "";
 
+    private MainAdapter mAdapter;
+    private RecyclerView mRecyclerView;
     private MainViewModel mViewModel;
     ApiService mApiService;
     private int mPage;
@@ -34,14 +36,16 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MainAdapter mainAdapter = new MainAdapter(this);
-        RecyclerView recyclerView = findViewById(R.id.movie_posters_rv);
+        mAdapter = new MainAdapter(this);
+        mAdapter.setLoadMoreListener(this);
         int spanCount = 2;
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             spanCount = 3;
         }
-        recyclerView.setLayoutManager(new GridLayoutManager(this, spanCount));
-        recyclerView.setAdapter(mainAdapter);
+
+        mRecyclerView = findViewById(R.id.movie_posters_rv);
+        mRecyclerView.setLayoutManager(new GridLayoutManager(this, spanCount));
+        mRecyclerView.setAdapter(mAdapter);
 
         mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
@@ -50,8 +54,8 @@ public class MainActivity
 
         mViewModel.getFetchPage().observe(this, this::onPageSet);
         mViewModel.getMovies().observe(this, movies -> {
-            mainAdapter.setMovieList(movies);
-            mainAdapter.notifyDataSetChanged();
+            mAdapter.setMovieList(movies);
+            mAdapter.notifyDataSetChanged();
         });
         mViewModel.getPageTitle().observe(this, this::setActionBarTitle);
 
@@ -63,6 +67,9 @@ public class MainActivity
             mViewModel.setFetchPage(1);
             fetchPage(1);
         }
+
+        mViewModel.setLifeCycleOwner(this);
+
     }
 
     private void onPageSet(Integer page) {
@@ -71,10 +78,11 @@ public class MainActivity
 
     private void fetchPage(int page) {
         if (getSupportActionBar() == null || getSupportActionBar().getTitle() == null) return;
-        if (getSupportActionBar().getTitle().equals(getString(R.string.top_rated_movies))) {
-            mApiService.getTopRatedMovies(page);
-        } else {
+        String actionBarTitle = getSupportActionBar().getTitle().toString();
+        if (actionBarTitle.equals(getString(R.string.popular_movies))) {
             mApiService.getPopularMovies(page);
+        } else if (actionBarTitle.equals(getString(R.string.top_rated_movies))) {
+            mApiService.getTopRatedMovies(page);
         }
     }
 
@@ -88,15 +96,25 @@ public class MainActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_popular_movies:
+                mAdapter.setLoadMoreListener(this);
+                mRecyclerView.scrollToPosition(0);
                 mViewModel.setPageTitle(getString(R.string.popular_movies));
                 mViewModel.setFetchPage(1);
                 fetchPage(1);
                 return true;
 
             case R.id.action_top_rated_movies:
+                mAdapter.setLoadMoreListener(this);
+                mRecyclerView.scrollToPosition(0);
                 mViewModel.setPageTitle(getString(R.string.top_rated_movies));
                 mViewModel.setFetchPage(1);
                 fetchPage(1);
+                return true;
+
+            case R.id.action_favorite_movies:
+                mAdapter.setLoadMoreListener(null);
+                mRecyclerView.scrollToPosition(0);
+                mViewModel.setPageTitle(getString(R.string.favorite_movies));
                 return true;
 
             default:

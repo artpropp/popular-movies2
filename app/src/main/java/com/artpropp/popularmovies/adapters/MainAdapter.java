@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.artpropp.popularmovies.MainActivity;
 import com.artpropp.popularmovies.R;
 import com.artpropp.popularmovies.models.Movie;
 import com.artpropp.popularmovies.utilities.ImageService;
@@ -31,9 +32,10 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MoviePosterVie
 
     public MainAdapter(OnMovieClickListener movieClickListener) {
         mMovieClickListener = movieClickListener;
-        if (movieClickListener instanceof OnLoadMoreListener) {
-            mLoadMoreListener = (OnLoadMoreListener) movieClickListener;
-        }
+    }
+
+    public void setLoadMoreListener(OnLoadMoreListener loadMoreListener) {
+        mLoadMoreListener = loadMoreListener;
     }
 
     public void setMovieList(List<Movie> movieList) {
