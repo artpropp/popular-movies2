@@ -5,13 +5,14 @@ import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LifecycleOwner;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.content.Intent;
-import android.net.Uri;
 import android.support.annotation.NonNull;
 
 import com.artpropp.popularmovies.MainActivity;
 import com.artpropp.popularmovies.R;
 import com.artpropp.popularmovies.adapters.DetailAdapter;
+import com.artpropp.popularmovies.database.FavoriteMovieDao;
+import com.artpropp.popularmovies.database.FavoriteMovieEntry;
+import com.artpropp.popularmovies.database.MovieDatabase;
 import com.artpropp.popularmovies.models.Movie;
 import com.artpropp.popularmovies.models.Review;
 import com.artpropp.popularmovies.models.ReviewResponse;
@@ -21,6 +22,8 @@ import com.artpropp.popularmovies.utilities.ApiService;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,6 +49,12 @@ public class DetailViewModel extends AndroidViewModel {
     private LifecycleOwner mLifecycleOwner;
     private OnTrailerClickListener mListener;
 
+    private Movie mMovie;
+    private FavoriteMovieDao mFavoriteMovieDao;
+    private LiveData<FavoriteMovieEntry> mFavoriteMovieEntryLiveData;
+    private Executor mExecutor;
+
+
     public DetailViewModel(@NonNull Application application) {
         super(application);
 
@@ -54,14 +63,16 @@ public class DetailViewModel extends AndroidViewModel {
         mAdapter = new DetailAdapter(this);
 
         mButtonTitle = new MutableLiveData<>();
-        mButtonTitle.setValue(application.getString(R.string.mark_as_favorite));
+
+        MovieDatabase movieDatabase = MovieDatabase.getInstance(this.getApplication());
+        mFavoriteMovieDao = movieDatabase.favoriteMovieDao();
+        mExecutor = Executors.newSingleThreadExecutor();
     }
 
     public void init(LifecycleOwner lifecycleOwner, Movie movie) {
         mLifecycleOwner = lifecycleOwner;
         if (mLifecycleOwner instanceof OnTrailerClickListener) {
-            OnTrailerClickListener listener = (OnTrailerClickListener) mLifecycleOwner;
-            mListener = listener;
+            mListener = (OnTrailerClickListener) mLifecycleOwner;
         }
         if (initialized) return;
         mTitle = movie.getTitle();
@@ -82,6 +93,7 @@ public class DetailViewModel extends AndroidViewModel {
         mAdapter.notifyDataSetChanged();
         fetchTrailers(movie);
         fetchReviews(movie);
+        fetchFavorite(movie);
 
         initialized = true;
     }
@@ -119,7 +131,14 @@ public class DetailViewModel extends AndroidViewModel {
     }
 
     public void onButtonClick() {
-        mButtonTitle.setValue(getApplication().getString(R.string.remove_from_favorites));
+        mExecutor.execute(() -> {
+            FavoriteMovieEntry entry = new FavoriteMovieEntry(mMovie);
+            if (mFavoriteMovieEntryLiveData.getValue() == null) {
+                mFavoriteMovieDao.insert(entry);
+            } else {
+                mFavoriteMovieDao.delete(entry);
+            }
+        });
     }
 
     public void onTrailerClick(String site, String key) {
@@ -159,10 +178,6 @@ public class DetailViewModel extends AndroidViewModel {
         mReviews.setValue(reviews);
     }
 
-    public LiveData<List<Review>> getReviews() {
-        return mReviews;
-    }
-
     private void fetchReviews(Movie movie) {
         ApiService webservice = new ApiService(MainActivity.API_KEY);
         webservice.getReviews(movie.getId(), new Callback<ReviewResponse>() {
@@ -181,4 +196,17 @@ public class DetailViewModel extends AndroidViewModel {
             }
         });
     }
+
+    private void fetchFavorite(Movie movie) {
+        mMovie = movie;
+        mFavoriteMovieEntryLiveData = mFavoriteMovieDao.loadById(movie.getId());
+        mFavoriteMovieEntryLiveData.observe(getLifecycleOwner(), favoriteMovieEntry -> {
+            if (favoriteMovieEntry != null) {
+                mButtonTitle.setValue(getApplication().getString(R.string.remove_from_favorites));
+            } else {
+                mButtonTitle.setValue(getApplication().getString(R.string.mark_as_favorite));
+            }
+        });
+    }
+
 }

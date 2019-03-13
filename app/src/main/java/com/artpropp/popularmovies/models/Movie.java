@@ -35,6 +35,11 @@ public class Movie implements Parcelable {
     private Integer voteCount;
     @Json(name = "video")
     private Boolean video;
+
+    public Movie(Integer id) {
+        this.id = id;
+    }
+
     @Json(name = "vote_average")
     private Double voteAverage;
 
